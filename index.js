@@ -34,7 +34,7 @@ async function run() {
         })
 
         //POST API
-        app.patch("/users", async (req, res) => {
+        app.post("/users", async (req, res) => {
             const newUser = req.body;
             const result = await usersCollection.insertOne(newUser);
             res.json(result);
