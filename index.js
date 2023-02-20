@@ -1,6 +1,7 @@
 const express = require('express');
-const { MongoClient} = require('mongodb');
+const { MongoClient } = require('mongodb');
 const cors = require('cors')
+const ObjectId = require('mongodb').ObjectId;
 const app = express();
 const port = 5000;
 
@@ -18,16 +19,34 @@ async function run() {
         await client.connect();
         const database = client.db("lalalala");
         const usersCollection = database.collection("users");
-        
-        //post API
-        app.post("/users", async(req, res) =>{
-            const newUser = req.body;
-            const result = await usersCollection.insertOne(newUser);
-            console.log("got new user", req.body);
-            console.log("added user", result)
-            res.json(result);
+
+        // Get API 
+        app.get('/users', async (req, res) => {
+            const cursor = usersCollection.find({});
+            const users = await cursor.toArray();
+            res.send(users);
+        });
+        app.get('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const user = await usersCollection.findOne(query);
+            res.send(user);
         })
 
+        //POST API
+        app.patch("/users", async (req, res) => {
+            const newUser = req.body;
+            const result = await usersCollection.insertOne(newUser);
+            res.json(result);
+        });
+
+        // DELETE API 
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await usersCollection.deleteOne(query);
+            res.json(result);
+        })
     } finally {
         //   await client.close();
     }
