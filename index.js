@@ -40,6 +40,23 @@ async function run() {
             res.json(result);
         });
 
+        // PATCH / PUT / UPDATE API
+        app.patch('/users/:id', async(req, res) =>{
+            const id = req.params.id;
+            const updateUser = req.body;
+            const filter = {_id: new ObjectId(id)};
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    name: updateUser.name,
+                    email: updateUser.email
+                },
+              };
+            const result = await usersCollection.updateOne(filter, updateDoc, options)
+            console.log('update user', req)
+            res.send(result);
+        })
+
         // DELETE API 
         app.delete('/users/:id', async (req, res) => {
             const id = req.params.id;
